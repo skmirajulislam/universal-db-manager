@@ -9,6 +9,21 @@ import java.util.Scanner;
 
 public class Main {
 
+    // Explicitly register all JDBC drivers at class-load time.
+    // jpackage bundles a custom JRE (jlink) that runs in module context;
+    // DriverManager's ServiceLoader won't scan unnamed-module classpath JARs
+    // automatically, so Class.forName() is required to trigger each driver's
+    // static DriverManager.registerDriver() call.
+    static {
+        try {
+            Class.forName("org.postgresql.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
     // Single shared Scanner for System.in — never closed because closing it
     // would permanently close System.in for the entire JVM session.
     private static final Scanner STDIN = new Scanner(System.in);
