@@ -22,11 +22,18 @@ jobs:
       - name: Build fat JAR
         run: mvn clean package
 
+      - name: Isolate Fat JAR for jpackage
+        # PowerShell commands to create a clean folder and move ONLY the Fat JAR into it
+        run: |
+          New-Item -ItemType Directory -Force -Path build_input
+          Copy-Item -Path target\database_manager-1.0-SNAPSHOT.jar -Destination build_input\
+
       - name: Create EXE with jpackage
         run: >
           jpackage
-          --input target
+          --input build_input
           --main-jar database_manager-1.0-SNAPSHOT.jar
+          --main-class com.Main
           --name "UniversalDBManager"
           --app-version "1.0"
           --description "Universal DB Manager - PostgreSQL, MySQL, SQLite"
@@ -35,6 +42,7 @@ jobs:
           --win-menu
           --win-dir-chooser
           --type exe
+          --add-modules java.sql,java.naming,java.management,java.desktop,java.security.jgss,java.rmi,jdk.crypto.ec,jdk.crypto.cryptoki
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
