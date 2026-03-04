@@ -1,0 +1,45 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-exe:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 22
+        uses: actions/setup-java@v4
+        with:
+          java-version: '22'
+          distribution: 'temurin'
+
+      - name: Build fat JAR
+        run: mvn clean package
+        working-directory: database_manager
+
+      - name: Create EXE with jpackage
+        run: |
+          jpackage `
+            --input database_manager/target `
+            --main-jar database_manager-1.0-SNAPSHOT.jar `
+            --name "UniversalDBManager" `
+            --app-version "1.0" `
+            --description "Universal DB Manager - PostgreSQL, MySQL, SQLite" `
+            --vendor "skmirajulislam" `
+            --win-shortcut `
+            --win-menu `
+            --win-dir-chooser `
+            --type exe
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: UniversalDBManager-Windows-EXE
+          path: "*.exe"
+          retention-days: 30
