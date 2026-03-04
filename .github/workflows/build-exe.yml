@@ -21,21 +21,20 @@ jobs:
 
       - name: Build fat JAR
         run: mvn clean package
-        working-directory: database_manager
 
       - name: Create EXE with jpackage
-        run: |
-          jpackage `
-            --input database_manager/target `
-            --main-jar database_manager-1.0-SNAPSHOT.jar `
-            --name "UniversalDBManager" `
-            --app-version "1.0" `
-            --description "Universal DB Manager - PostgreSQL, MySQL, SQLite" `
-            --vendor "skmirajulislam" `
-            --win-shortcut `
-            --win-menu `
-            --win-dir-chooser `
-            --type exe
+        run: >
+          jpackage
+          --input target
+          --main-jar database_manager-1.0-SNAPSHOT.jar
+          --name "UniversalDBManager"
+          --app-version "1.0"
+          --description "Universal DB Manager - PostgreSQL, MySQL, SQLite"
+          --vendor "skmirajulislam"
+          --win-shortcut
+          --win-menu
+          --win-dir-chooser
+          --type exe
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
